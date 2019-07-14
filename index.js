@@ -15,74 +15,103 @@ fetch(serverUrl,{
    //mode: "no-cors",
  })
  .then( res => {
-   return res.json(); })
+    return res.json();
+  })
   .then( geoData => {
-    let marker = L.geoJSON(geoData).addTo(map)
+    //console.log(geoData);
+    let marker = L.geoJSON(geoData, {
+      coordsToLatLng: function (coords) {
+          // latitude , longitude, altitude
+          //return new L.LatLng(coords[1], coords[0], coords[2]); //Normal behavior
+          return new L.LatLng(coords[0], coords[1], coords[2]);
+      }
+      }).addTo(map)
     .bindPopup().addTo(map);
 
-marker.on('click', onMarkerClick );        
-  
-function onMarkerClick(e){
+marker.on('click', onMarkerClick);
 
-  let name = geoData[0].properties.name;
-  let buildings = geoData[0].properties.buildings;
-  let sources = geoData[0].properties.sources;
-  let books = geoData[0].properties.books;
-  let picture = geoData[0].properties.buildings[0].picture; // just testing for belgrade picture
+
+ function onMarkerClick (e){
+  let settlement = e.sourceTarget.feature.properties ;
+  let name = settlement.name;
+  let buildings = settlement.buildings;
+  let sources = settlement.sources;
+  let books = settlement.books;
+  
+  
+  let picture = function (){
+    let picture = document.createElement('img');
+    picture.src = settlement.buildings[0].picture;
+    return picture;
+  };
+    
 
   let popup = e.target.getPopup();
   let table = document.createElement('table');
-  table.border = "1px";
-  table.style.borderCollapse = "separate";
-  table.createTHead();
-  table.tHead.append(name); 
-
-
-  let row0 = table.insertRow(0);// problem of pushing other elements
-  //row0.insertCell(0).append(picture);
-
-  let row1 = table.insertRow(1);
-  row1.insertCell(0).append("Грађевине:");
-  for (let i = 0; i < buildings.length; i++ ){
-    row1.insertCell([i+1]).append(buildings[i].name);
-  }
-
-  let row2 = table.insertRow(2);
-  row2.insertCell(0).append("Извори:");
-  for (let i = 0; i < sources.length; i++ ){
-    row2.insertCell([i+1]).append(sources[i].name);
-  }
-
-  let row3 = table.insertRow(3);
-  row3.insertCell(0).append("Књиге:");
-  for (let i = 0; i < books.length; i++ ){
-    row3.insertCell([i+1]).append(books[i].name);
-  }
+  table.style.borderCollapse = "collapse";
   
 
+  if(settlement.name !== undefined){
+    table.createTHead();
+    table.tHead.append(name); 
+  }
 
-  popup.setContent(table);
+  try{
+  let row0 = table.insertRow();// cell problem of pushing other cells
+  row0.insertCell(0).appendChild( picture());
+  }catch(err){
+    console.error("ERR:" + err);
+  }
 
-  let img = document.createElement("img");
-  img.src = picture;
-  document.querySelector('table').appendChild(img);
-}
+  if (settlement.buildings !== undefined){
+    let row1 = table.insertRow(1);
+    row1.insertCell(0).append("Грађевине:");
+    for (let i = 0; i < buildings.length; i++ ){
+      row1.insertCell([i+1]).append(buildings[i].name);
+    }
+  }
+  if (settlement.sources !== undefined){
+    let row2 = table.insertRow();
+    row2.insertCell(0).append("Извори:");
+    for (let i = 0; i < sources.length; i++ ){
+      row2.insertCell([i+1]).append(sources[i].name);
+    }
+  }
+  if (settlement.books !== undefined){
+    let row3 = table.insertRow();
+    row3.insertCell(0).append("Књиге:");
+    for (let i = 0; i < books.length; i++ ){
+      row3.insertCell([i+1]).append(books[i].name);
+    }
+  }
+  popup.setContent(table); 
+  
+  let rows = document.querySelector('table').rows.length;
+  for (let i = 0; i < rows; i++){
+    document.querySelector('table').rows[i].style.borderBottom = "1px solid green";
+  }
+
+  // side view of settlements
+let settlementDataView = document.getElementById('settlementDataView');
+
+if (settlementDataView.querySelector('img') !== null){
+    settlementDataView.removeChild(settlementDataView.querySelector('img'));
+  }else{
+    try{
+    settlementDataView.appendChild(  picture() );
+    }catch(err){console.error("ERR:" + err);}
+  }
+  }//end of onMarkerClick
+
+});
+
+map.addEventListener('click', ()=>{
+  if (settlementDataView.contains( settlementDataView.querySelector('img') ) ){
+    settlementDataView.removeChild(settlementDataView.querySelector('img'));
+  }
 });
 
 
-document.getElementById("jsonButton").addEventListener('click', () => {
-     fetch(serverUrl,{
-      method: "GET",
-      mode: "cors",
-      headers: {
-       //"Content-Type":"application/vnd.geo+json; charset=utf-8"
-      }
-    })
-    .then( res => { return res.json(); })
-    .then(body => {
-      console.log(JSON.stringify(body)); 
-    });
-  });
 
 });
 

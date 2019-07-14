@@ -1,0 +1,10 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [43.584719, 21.322188]
+  },
+  "properties": {
+    "name": "Крушевац"
+  }
+}

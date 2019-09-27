@@ -39,9 +39,11 @@ marker.on('click', onMarkerClick);
   let books = settlement.books;
   
   
-  let picture = function (){
+  let insertPicture = function (){
     let picture = document.createElement('img');
     picture.src = settlement.buildings[0].picture;
+    picture.style.display="block";
+    picture.style.margin = "0 auto";
     return picture;
   };
     
@@ -58,7 +60,7 @@ marker.on('click', onMarkerClick);
 
   try{
   let row0 = table.insertRow();// cell problem of pushing other cells
-  row0.insertCell(0).appendChild( picture());
+  row0.insertCell(0).appendChild( insertPicture());
   }catch(err){
     console.error("ERR:" + err);
   }
@@ -98,7 +100,7 @@ if (settlementDataView.querySelector('img') !== null){
     settlementDataView.removeChild(settlementDataView.querySelector('img'));
   }else{
     try{
-    settlementDataView.appendChild(  picture() );
+    settlementDataView.appendChild(insertPicture());
     }catch(err){console.error("ERR:" + err);}
   }
   }//end of onMarkerClick

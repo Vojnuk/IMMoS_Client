@@ -2,10 +2,13 @@ document.addEventListener("DOMContentLoaded", function(){
 
 let map = L.map( document.getElementById("map") ).setView( [44.82, 20.45], 6 );
 
-let tileProvider = 'https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png';
+let tileProvider = 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}{r}.{ext}';
 let attribution = {
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	subdomains: 'abcd',
+	minZoom: 0,
 	maxZoom: 18,
-	attribution: 'Tiles courtesy of <a href="http://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	ext: 'png'
 };
 L.tileLayer( tileProvider, attribution).addTo(map);
 
